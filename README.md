@@ -5,8 +5,10 @@
 ## ✨ 功能特性
 
 - 📤 **上传到工作区**：点击输入框左侧的「文件」按钮选择文件，上传到当前会话工作区的 `.agent-hub/uploads/` 目录
-- 🗜️ **zip 自动解压**：上传 zip 后自动解压到同目录，并把文件清单写入输入框，Agent 可直接读取解压后的文件
+- 🗜️ **zip 自动解压**：上传 zip 后自动解压到同目录，Agent 可直接读取解压后的文件（支持 bzip2/lzma/zstd 等格式，见系统工具兜底）
 - 🖱️ **页面级拖拽上传**：把文件拖到**页面任意位置**即出现"松开上传"全屏提示，松手即可上传（图片拖拽保持原生附件行为，不拦截）
+- 🏷️ **上传文件列表**：上传成功后，文件以带序号的 chip 显示在「文件」按钮旁（文件名 + 大小，zip 带徽标），鼠标悬停显示完整路径/解压目录；每个 chip 可单独删除、可一键清空，删除会同时移除工作区中的副本
+- 💬 **命令自由输入**：上传不会自动往输入框塞提示文本，命令完全由你写（"帮我改这个" / "只读这个" 等），按需引用 chip 路径即可
 - ⚙️ **图形化调整上限**：设置 → General → 可分别调整「文件上传大小上限」和「zip 解压上限」（解压体积 + 条目数），输入数字点保存立即生效
 - 🛠️ **系统工具兜底解压**：内置解压器无法处理的压缩格式（bzip2/lzma/zstd 等）或损坏 zip，自动尝试 7-Zip / tar / PowerShell Expand-Archive
 - 🌐 **多语言**：界面中英双语，跟随 Harness 设置里的语言切换即时生效
@@ -54,18 +56,30 @@ git clone https://github.com/shililinghu/dsh-file-upload-deepseek-harness-plug-i
 
 - 点击输入框左侧的 **「文件」** 按钮选择文件（可多选）
 - 或把文件**拖到页面任意位置**，出现"松开以上传到工作区"遮罩后松手
-- 上传成功后，输入框会自动填入 `请读取工作区文件：\`路径\``，发送后 Agent 即可读取
+- 上传成功后，文件会以 chip 形式显示在「文件」按钮旁（带序号），**输入框保持空白**，命令由你自己输入
+
+### 管理已上传文件
+
+每个文件 chip 显示序号、文件名、大小（zip 带徽标）：
+
+```
+已上传： 1. report.zip  2.3 MB [zip] [✕]  2. 文档.md  12 KB [✕]  3. ….zip  [✕]  [清空]
+```
+
+- **查看路径**：鼠标悬停 chip，显示完整路径（zip 显示解压目录和文件数）
+- **删除单个**：点 chip 末尾的 ✕（悬停变红），会**同时删除工作区 `.agent-hub/uploads/` 里的文件副本**（zip 连同解压目录）
+- **清空全部**：点「清空」，删除本会话所有已上传文件的副本
+- 删除只影响当前会话的列表，不会影响其他会话的上传
 
 ### 上传 zip
 
-上传 zip 后会自动解压，输入框会提示：
+上传 zip 后会自动解压，chip 带 `zip` 徽标，悬停可看到解压目录。之后你可以在输入框里自由下命令，比如：
 
-```
-已上传并解压 zip：`路径.zip` → `解压目录/`，共 N 个文件：`a.txt`、`b.md`…。请读取解压后的文件。
-```
+- "读取 `.agent-hub/uploads/xxx/` 下的 README"
+- "修改解压目录里 `config.json` 的某个配置"
 
-- 若由系统工具兜底解压（如 bzip2 压缩），会额外标注"（由 tar 解压）"
-- 若解压超限，会给出中文/英文友好提示（"文件已保存但未解压，请调高 zip 解压上限…"），并保留 zip 文件本身
+- 若由系统工具兜底解压（如 bzip2 压缩），悬停提示会标注解压方式
+- 若解压超限，chip 会显示红色 ⚠️，悬停给出中文/英文友好提示（"文件已保存但未解压，请调高 zip 解压上限…"），zip 文件本身保留
 
 ### 调整上传/解压上限
 
@@ -88,10 +102,10 @@ git clone https://github.com/shililinghu/dsh-file-upload-deepseek-harness-plug-i
 
 ## 🔧 技术说明
 
-- **宿主端**（`lib/index.js`）：通过 `webServer` 注册 `/agent-hub/file-upload` 上传路由与 `/agent-hub/file-upload/config` 配置路由；上传采用流式写入，zip 魔数嗅探 + 自动解压；解压失败时按 7z → tar → PowerShell 顺序兜底
+- **宿主端**（`lib/index.js`）：通过 `webServer` 注册 `/agent-hub/file-upload` 上传路由、`/agent-hub/file-upload/delete` 删除路由与 `/agent-hub/file-upload/config` 配置路由；上传采用流式写入，zip 魔数嗅探 + 自动解压；解压失败时按 7z → tar → PowerShell 顺序兜底；删除路由校验路径必须位于 uploads 目录内，防止路径穿越
 - **解压器**（`lib/zip.js`）：零依赖纯 JS zip 解析（`node:zlib`），支持 STORE/DEFLATE、ZIP64、UTF-8 文件名；结构化错误码（`ENTRY_LIMIT` / `SIZE_LIMIT` / `CORRUPT`）供客户端本地化提示
-- **客户端**（`lib/client.js`）：注册 `conversation.input.left`（上传按钮）与 `settings.general.item`（上限设置行）两个 Slot；接入 DSH `locale` 服务实现中英双语；页面级拖拽通过 window 事件监听实现（非图片文件才拦截）
-- **多语言**：词典注册在 `agent-hub-file-upload` 命名空间（`zh-CN` / `en`），组件订阅 locale 变更自动重渲染
+- **客户端**（`lib/client.js`）：注册 `conversation.input.left`（上传按钮 + 文件列表）与 `settings.general.item`（上限设置行）两个 Slot；文件列表为模块级 store（按会话隔离，删除/清空只影响当前会话）；接入 DSH `locale` 服务实现中英双语；页面级拖拽通过 window 事件监听实现（非图片文件才拦截）
+- **多语言**：词典注册在 `agent-hub-file-upload` 命名空间（`zh` / `en`，对应 DSH 的语言 id），组件订阅 locale 变更自动重渲染
 
 ## 📄 License
 
