@@ -1,5 +1,7 @@
 # dsh-file-upload-deepseek-harness-plug-in
 
+**中文** | [English](README.en.md)
+
 > DeepSeek Harness 工作区文件上传插件 —— 支持普通文件上传、zip 自动解压、页面级拖拽上传，上传/解压上限可在设置面板图形化调整，界面中英双语。
 
 ## ✨ 功能特性
