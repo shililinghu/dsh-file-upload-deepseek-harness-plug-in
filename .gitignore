@@ -1,0 +1,10 @@
+# Runtime-generated local configuration (max upload size etc.)
+config.json
+
+# Dependencies
+node_modules/
+
+# Logs & temp
+*.log
+.DS_Store
+Thumbs.db
