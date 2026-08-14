@@ -28,7 +28,24 @@
   },
   "files": [
     "lib/index.js",
-    "lib/client.js"
+    "lib/client.js",
+    "lib/zip.js",
+    "LICENSE"
   ],
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "file-upload",
+    "zip"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shililinghu/dsh-file-upload-deepseek-harness-plug-in.git"
+  },
+  "homepage": "https://github.com/shililinghu/dsh-file-upload-deepseek-harness-plug-in#readme",
+  "bugs": {
+    "url": "https://github.com/shililinghu/dsh-file-upload-deepseek-harness-plug-in/issues"
+  },
   "license": "MIT"
 }

@@ -4,6 +4,8 @@
 
 > DeepSeek Harness 工作区文件上传插件 —— 支持普通文件上传、zip 自动解压、页面级拖拽上传，上传/解压上限可在设置面板图形化调整，界面中英双语。
 
+> [最新 Release](https://github.com/shililinghu/dsh-file-upload-deepseek-harness-plug-in/releases/latest) · [dsh-plugin 生态](https://github.com/topics/dsh-plugin) · [反馈](https://github.com/shililinghu/dsh-file-upload-deepseek-harness-plug-in/issues/1)
+
 ## ✨ 功能特性
 
 - 📤 **上传到工作区**：点击输入框左侧的「文件」按钮选择文件，上传到当前会话工作区的 `.agent-hub/uploads/` 目录
@@ -24,6 +26,15 @@
 - Node.js 环境可用
 
 ### 步骤
+
+推荐直接从 GitHub 安装：
+
+```bash
+dsh plugin --profile web add github:shililinghu/dsh-file-upload-deepseek-harness-plug-in
+# 重启 dsh web 后刷新浏览器页面
+```
+
+也可以使用本地源码目录安装：
 
 1. 将插件放入 Harness 用户插件目录：
 
@@ -109,6 +120,10 @@ git clone https://github.com/shililinghu/dsh-file-upload-deepseek-harness-plug-i
 - **客户端**（`lib/client.js`）：注册 `conversation.input.left`（上传按钮 + 文件列表）与 `settings.general.item`（上限设置行）两个 Slot；文件列表为模块级 store（按会话隔离，删除/清空只影响当前会话）；接入 DSH `locale` 服务实现中英双语；页面级拖拽通过 window 事件监听实现（非图片文件才拦截）
 - **多语言**：词典注册在 `agent-hub-file-upload` 命名空间（`zh` / `en`，对应 DSH 的语言 id），组件订阅 locale 变更自动重渲染
 
+## 💬 反馈
+
+发现问题或有改进建议，请在 [反馈 issue](https://github.com/shililinghu/dsh-file-upload-deepseek-harness-plug-in/issues/1) 中留言。
+
 ## 📄 License
 
-MIT
+本项目采用 [MIT License](LICENSE)。

@@ -2,6 +2,8 @@
 
 > Workspace file upload plugin for DeepSeek Harness — upload files, auto-extract zips, drag & drop anywhere on the page, adjust upload/extract limits from the Settings panel, with a bilingual (zh/en) UI.
 
+> [Latest Release](https://github.com/shililinghu/dsh-file-upload-deepseek-harness-plug-in/releases/latest) · [dsh-plugin ecosystem](https://github.com/topics/dsh-plugin) · [Feedback](https://github.com/shililinghu/dsh-file-upload-deepseek-harness-plug-in/issues/1)
+
 ## ✨ Features
 
 - 📤 **Upload to the workspace**: click the **Files** button on the left of the input box to upload files into the current session's workspace `.agent-hub/uploads/` directory
@@ -22,6 +24,15 @@
 - Node.js available
 
 ### Steps
+
+Recommended: install directly from GitHub:
+
+```bash
+dsh plugin --profile web add github:shililinghu/dsh-file-upload-deepseek-harness-plug-in
+# Restart dsh web, then refresh the browser page
+```
+
+You can also install from a local source directory:
 
 1. Put the plugin into the Harness user plugin directory:
 
@@ -107,6 +118,10 @@ Uploaded zips extract automatically; the chip gets a `zip` badge and hovering sh
 - **Client** (`lib/client.js`): registers `conversation.input.left` (upload button + file list) and `settings.general.item` (limit rows); the file list is a module-level store scoped per session (delete/clear only touch the current session); DSH `locale` service powers the bilingual UI; page-wide drag & drop via window event listeners (only non-image files are intercepted)
 - **i18n**: dictionaries live in the `agent-hub-file-upload` namespace (`zh` / `en`, matching DSH's locale ids); components subscribe to locale changes and re-render automatically
 
+## 💬 Feedback
+
+Please leave bug reports and suggestions in the [feedback issue](https://github.com/shililinghu/dsh-file-upload-deepseek-harness-plug-in/issues/1).
+
 ## 📄 License
 
-MIT
+This project is licensed under the [MIT License](LICENSE).
